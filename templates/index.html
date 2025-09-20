@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mental Health Companion - AI-Powered Support</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <!-- Header -->
+      <header class="header">
+        <div class="header-content">
+          <h1><i class="fas fa-heart"></i> Mental Health Companion</h1>
+          <p>
+            AI-powered support through text, voice, and facial expression
+            analysis
+          </p>
+        </div>
+      </header>
+
+      <!-- Main Content -->
+      <main class="main-content">
+        <!-- Analysis Panel -->
+        <div class="analysis-panel">
+          <div class="analysis-section">
+            <h3><i class="fas fa-video"></i> Facial Expression Analysis</h3>
+            <div class="camera-container">
+              <video id="videoElement" autoplay muted></video>
+              <canvas id="canvasElement" style="display: none"></canvas>
+              <div class="camera-controls">
+                <button id="toggleCamera" class="btn btn-primary">
+                  <i class="fas fa-camera"></i> Start Camera
+                </button>
+                <button id="captureImage" class="btn btn-secondary" disabled>
+                  <i class="fas fa-camera-retro"></i> Capture
+                </button>
+              </div>
+            </div>
+            <div id="facialResults" class="results-display"></div>
+          </div>
+
+          <div class="analysis-section">
+            <h3><i class="fas fa-microphone"></i> Voice Analysis</h3>
+            <div class="audio-controls">
+              <button id="toggleRecording" class="btn btn-primary">
+                <i class="fas fa-microphone"></i> Start Recording
+              </button>
+              <div id="recordingStatus" class="recording-status"></div>
+            </div>
+            <div id="voiceResults" class="results-display"></div>
+          </div>
+        </div>
+
+        <!-- Chat Interface -->
+        <div class="chat-container">
+          <div class="chat-header">
+            <h3>
+              <i class="fas fa-comments"></i> Chat with Your Mental Health
+              Companion
+            </h3>
+            <div class="mood-indicator">
+              <span id="moodIndicator">😊 Neutral</span>
+            </div>
+          </div>
+
+          <div id="chatMessages" class="chat-messages">
+            <div class="message bot-message">
+              <div class="message-avatar">
+                <i class="fas fa-robot"></i>
+              </div>
+              <div class="message-content">
+                <p>
+                  Hello! I'm your mental health companion. I'm here to listen,
+                  support, and help you understand your emotional well-being
+                  through our conversation, your facial expressions, and voice
+                  patterns. How are you feeling today?
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="chat-input-container">
+            <div class="input-group">
+              <textarea
+                id="messageInput"
+                placeholder="Share your thoughts and feelings..."
+                rows="3"
+              ></textarea>
+              <button id="sendMessage" class="btn btn-primary">
+                <i class="fas fa-paper-plane"></i> Send
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recommendations Panel -->
+        <div class="recommendations-panel">
+          <h3><i class="fas fa-lightbulb"></i> Personalized Recommendations</h3>
+          <div id="recommendationsContent" class="recommendations-content">
+            <p>
+              Start a conversation or capture your expression to receive
+              personalized mental health recommendations.
+            </p>
+          </div>
+        </div>
+
+        <!-- Emergency Resources -->
+        <div class="emergency-panel">
+          <h3><i class="fas fa-exclamation-triangle"></i> Crisis Resources</h3>
+          <div class="emergency-content">
+            <div class="crisis-hotline">
+              <strong>National Suicide Prevention Lifeline:</strong>
+              <a href="tel:988" class="emergency-link">988</a>
+            </div>
+            <div class="crisis-hotline">
+              <strong>Crisis Text Line:</strong>
+              <span class="emergency-link">Text HOME to 741741</span>
+            </div>
+            <button id="viewAllResources" class="btn btn-emergency">
+              <i class="fas fa-phone"></i> View All Emergency Resources
+            </button>
+          </div>
+        </div>
+      </main>
+
+      <!-- Analysis Results Modal -->
+      <div id="analysisModal" class="modal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3>Comprehensive Analysis Results</h3>
+            <span class="close">&times;</span>
+          </div>
+          <div id="modalBody" class="modal-body">
+            <!-- Analysis results will be populated here -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading Overlay -->
+      <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner">
+          <i class="fas fa-spinner fa-spin"></i>
+          <p>Analyzing your emotional state...</p>
+        </div>
+      </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+  </body>
+</html>
