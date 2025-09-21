@@ -2,5 +2,4 @@ services:
   - type: web
     name: mental_health-1
     env: python
-    pythonVersion: "3.10.13"
-    # Other configurations...
+    pythonVersion: "3.10.13"  # Make sure this matches your desired Python version
