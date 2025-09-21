@@ -5,20 +5,7 @@ import io
 from PIL import Image
 from datetime import datetime
 import os
-
-try:
-    import cv2
-    CV2_AVAILABLE = True
-except ImportError:
-    CV2_AVAILABLE = False
-    print("OpenCV not available, facial analysis will be limited")
-
-try:
-    from transformers import pipeline
-    TRANSFORMERS_AVAILABLE = True
-except ImportError:
-    TRANSFORMERS_AVAILABLE = False
-    print("Transformers not available, using basic sentiment analysis")
+import random
 
 app = Flask(__name__)
 
@@ -34,30 +21,13 @@ class MentalHealthAnalyzer:
         }
 
     def setup_models(self):
-        if TRANSFORMERS_AVAILABLE:
-            try:
-                self.text_analyzer = pipeline("sentiment-analysis")
-                print("✓ Loaded transformers sentiment pipeline")
-            except Exception as e:
-                print(f"Error loading transformers pipeline: {e}")
-                self.text_analyzer = None
-        else:
-            self.text_analyzer = None
+        # Using basic sentiment analysis for deployment compatibility
+        self.text_analyzer = None
+        print("✓ Using basic sentiment analysis for deployment")
 
     def analyze_text_sentiment(self, text):
         try:
-            if self.text_analyzer:
-                result = self.text_analyzer(text)
-                if isinstance(result, list) and result:
-                    sentiment = result[0]
-                else:
-                    sentiment = {'label': 'NEUTRAL', 'score': 0.5}
-                return {
-                    'sentiment': sentiment,
-                    'confidence': sentiment['score']
-                }
-            else:
-                return self.basic_sentiment_analysis(text)
+            return self.basic_sentiment_analysis(text)
         except Exception as e:
             print(f"Error in text sentiment analysis: {e}")
             return self.basic_sentiment_analysis(text)
@@ -78,61 +48,43 @@ class MentalHealthAnalyzer:
 
     def analyze_facial_emotion(self, image_data):
         try:
-            if not CV2_AVAILABLE:
-                # Fallback when OpenCV is not available
-                emotions = {
-                    'happy': np.random.uniform(0.1, 0.9),
-                    'sad': np.random.uniform(0.1, 0.9),
-                    'angry': np.random.uniform(0.1, 0.9),
-                    'fear': np.random.uniform(0.1, 0.9),
-                    'surprise': np.random.uniform(0.1, 0.9),
-                    'neutral': np.random.uniform(0.1, 0.9)
-                }
-                total = sum(emotions.values())
-                emotions = {k: v / total for k, v in emotions.items()}
-                dominant = max(emotions, key=emotions.get)
-                return {
-                    'faces_detected': 1,  # Assume face detected for demo
-                    'emotions': emotions,
-                    'dominant_emotion': dominant,
-                    'confidence': emotions[dominant],
-                    'note': 'OpenCV not available, using mock analysis'
-                }
-            
+            # Simple image processing without OpenCV for deployment compatibility
             image_bytes = base64.b64decode(image_data.split(',')[1])
             image = Image.open(io.BytesIO(image_bytes))
-            image_np = np.array(image)
-            gray = cv2.cvtColor(image_np, cv2.COLOR_RGB2GRAY)
-
-            face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
-            faces = face_cascade.detectMultiScale(gray, 1.1, 4)
-
-            if len(faces) > 0:
-                # Mock emotion scores for demo
-                emotions = {
-                    'happy': np.random.uniform(0.1, 0.9),
-                    'sad': np.random.uniform(0.1, 0.9),
-                    'angry': np.random.uniform(0.1, 0.9),
-                    'fear': np.random.uniform(0.1, 0.9),
-                    'surprise': np.random.uniform(0.1, 0.9),
-                    'neutral': np.random.uniform(0.1, 0.9)
-                }
-                total = sum(emotions.values())
-                emotions = {k: v / total for k, v in emotions.items()}
-                dominant = max(emotions, key=emotions.get)
-                return {
-                    'faces_detected': len(faces),
-                    'emotions': emotions,
-                    'dominant_emotion': dominant,
-                    'confidence': emotions[dominant]
-                }
-            else:
-                return {
-                    'faces_detected': 0,
-                    'emotions': {},
-                    'dominant_emotion': 'neutral',
-                    'confidence': 0.0
-                }
+            
+            # Mock emotion analysis based on image properties
+            width, height = image.size
+            brightness = sum(image.convert('L').getdata()) / (width * height)
+            
+            # Generate emotions based on image characteristics
+            emotions = {
+                'happy': random.uniform(0.1, 0.9),
+                'sad': random.uniform(0.1, 0.9),
+                'angry': random.uniform(0.1, 0.9),
+                'fear': random.uniform(0.1, 0.9),
+                'surprise': random.uniform(0.1, 0.9),
+                'neutral': random.uniform(0.1, 0.9)
+            }
+            
+            # Adjust based on brightness (brighter images tend to be more positive)
+            if brightness > 150:
+                emotions['happy'] += 0.2
+                emotions['sad'] -= 0.1
+            elif brightness < 100:
+                emotions['sad'] += 0.2
+                emotions['happy'] -= 0.1
+            
+            total = sum(emotions.values())
+            emotions = {k: v / total for k, v in emotions.items()}
+            dominant = max(emotions, key=emotions.get)
+            
+            return {
+                'faces_detected': 1,  # Assume face detected for demo
+                'emotions': emotions,
+                'dominant_emotion': dominant,
+                'confidence': emotions[dominant],
+                'note': 'Using simplified image analysis for deployment'
+            }
         except Exception as e:
             print(f"Error facial emotion analysis: {e}")
             return {
@@ -147,11 +99,11 @@ class MentalHealthAnalyzer:
         try:
             # Placeholder mock emotions
             emotions = {
-                'calm': np.random.uniform(0.1, 0.8),
-                'stressed': np.random.uniform(0.1, 0.8),
-                'happy': np.random.uniform(0.1, 0.8),
-                'sad': np.random.uniform(0.1, 0.8),
-                'anxious': np.random.uniform(0.1, 0.8)
+                'calm': random.uniform(0.1, 0.8),
+                'stressed': random.uniform(0.1, 0.8),
+                'happy': random.uniform(0.1, 0.8),
+                'sad': random.uniform(0.1, 0.8),
+                'anxious': random.uniform(0.1, 0.8)
             }
             total = sum(emotions.values())
             emotions = {k: v / total for k, v in emotions.items()}
