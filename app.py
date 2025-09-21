@@ -1,18 +1,13 @@
 from flask import Flask, render_template, request, jsonify
-import numpy as np
-import base64
-import io
-from PIL import Image
 from datetime import datetime
-import os
 import random
+import os
 
 app = Flask(__name__)
 
-# Mental Health Analyzer class
+# Mental Health Analyzer class - simplified for deployment
 class MentalHealthAnalyzer:
     def __init__(self):
-        self.setup_models()
         self.conversation_history = []
         self.user_profile = {
             'mood_history': [],
@@ -20,109 +15,65 @@ class MentalHealthAnalyzer:
             'recommendations_given': []
         }
 
-    def setup_models(self):
-        # Using basic sentiment analysis for deployment compatibility
-        self.text_analyzer = None
-        print("✓ Using basic sentiment analysis for deployment")
-
     def analyze_text_sentiment(self, text):
-        try:
-            return self.basic_sentiment_analysis(text)
-        except Exception as e:
-            print(f"Error in text sentiment analysis: {e}")
-            return self.basic_sentiment_analysis(text)
-
-    def basic_sentiment_analysis(self, text):
-        positive_words = ['happy', 'good', 'great', 'excellent', 'wonderful', 'amazing', 'love', 'joy', 'excited', 'fantastic']
-        negative_words = ['sad', 'bad', 'terrible', 'awful', 'hate', 'angry', 'depressed', 'anxious', 'worried', 'stressed']
+        """Basic keyword-based sentiment analysis"""
+        positive_words = ['happy', 'good', 'great', 'excellent', 'wonderful', 'amazing', 'love', 'joy', 'excited', 'fantastic', 'awesome', 'brilliant', 'perfect']
+        negative_words = ['sad', 'bad', 'terrible', 'awful', 'hate', 'angry', 'depressed', 'anxious', 'worried', 'stressed', 'horrible', 'miserable', 'upset']
+        
         text_lower = text.lower()
         pos_count = sum(1 for w in positive_words if w in text_lower)
         neg_count = sum(1 for w in negative_words if w in text_lower)
 
         if pos_count > neg_count:
-            return {'sentiment': {'label': 'POSITIVE', 'score': 0.7}, 'confidence': 0.7}
+            return {'sentiment': {'label': 'POSITIVE', 'score': 0.8}, 'confidence': 0.8}
         elif neg_count > pos_count:
-            return {'sentiment': {'label': 'NEGATIVE', 'score': 0.7}, 'confidence': 0.7}
+            return {'sentiment': {'label': 'NEGATIVE', 'score': 0.8}, 'confidence': 0.8}
         else:
             return {'sentiment': {'label': 'NEUTRAL', 'score': 0.5}, 'confidence': 0.5}
 
     def analyze_facial_emotion(self, image_data):
-        try:
-            # Simple image processing without OpenCV for deployment compatibility
-            image_bytes = base64.b64decode(image_data.split(',')[1])
-            image = Image.open(io.BytesIO(image_bytes))
-            
-            # Mock emotion analysis based on image properties
-            width, height = image.size
-            brightness = sum(image.convert('L').getdata()) / (width * height)
-            
-            # Generate emotions based on image characteristics
-            emotions = {
-                'happy': random.uniform(0.1, 0.9),
-                'sad': random.uniform(0.1, 0.9),
-                'angry': random.uniform(0.1, 0.9),
-                'fear': random.uniform(0.1, 0.9),
-                'surprise': random.uniform(0.1, 0.9),
-                'neutral': random.uniform(0.1, 0.9)
-            }
-            
-            # Adjust based on brightness (brighter images tend to be more positive)
-            if brightness > 150:
-                emotions['happy'] += 0.2
-                emotions['sad'] -= 0.1
-            elif brightness < 100:
-                emotions['sad'] += 0.2
-                emotions['happy'] -= 0.1
-            
-            total = sum(emotions.values())
-            emotions = {k: v / total for k, v in emotions.items()}
-            dominant = max(emotions, key=emotions.get)
-            
-            return {
-                'faces_detected': 1,  # Assume face detected for demo
-                'emotions': emotions,
-                'dominant_emotion': dominant,
-                'confidence': emotions[dominant],
-                'note': 'Using simplified image analysis for deployment'
-            }
-        except Exception as e:
-            print(f"Error facial emotion analysis: {e}")
-            return {
-                'faces_detected': 0,
-                'emotions': {},
-                'dominant_emotion': 'neutral',
-                'confidence': 0.0,
-                'error': str(e)
-            }
+        """Mock facial emotion analysis"""
+        emotions = {
+            'happy': random.uniform(0.1, 0.9),
+            'sad': random.uniform(0.1, 0.9),
+            'angry': random.uniform(0.1, 0.9),
+            'fear': random.uniform(0.1, 0.9),
+            'surprise': random.uniform(0.1, 0.9),
+            'neutral': random.uniform(0.1, 0.9)
+        }
+        total = sum(emotions.values())
+        emotions = {k: v / total for k, v in emotions.items()}
+        dominant = max(emotions, key=emotions.get)
+        
+        return {
+            'faces_detected': 1,
+            'emotions': emotions,
+            'dominant_emotion': dominant,
+            'confidence': emotions[dominant],
+            'note': 'Mock analysis for deployment'
+        }
 
     def analyze_voice_emotion(self, audio_data):
-        try:
-            # Placeholder mock emotions
-            emotions = {
-                'calm': random.uniform(0.1, 0.8),
-                'stressed': random.uniform(0.1, 0.8),
-                'happy': random.uniform(0.1, 0.8),
-                'sad': random.uniform(0.1, 0.8),
-                'anxious': random.uniform(0.1, 0.8)
-            }
-            total = sum(emotions.values())
-            emotions = {k: v / total for k, v in emotions.items()}
-            dominant = max(emotions, key=emotions.get)
-            return {
-                'emotions': emotions,
-                'dominant_emotion': dominant,
-                'confidence': emotions[dominant]
-            }
-        except Exception as e:
-            print(f"Error voice emotion analysis: {e}")
-            return {
-                'emotions': {},
-                'dominant_emotion': 'neutral',
-                'confidence': 0.0,
-                'error': str(e)
-            }
+        """Mock voice emotion analysis"""
+        emotions = {
+            'calm': random.uniform(0.1, 0.8),
+            'stressed': random.uniform(0.1, 0.8),
+            'happy': random.uniform(0.1, 0.8),
+            'sad': random.uniform(0.1, 0.8),
+            'anxious': random.uniform(0.1, 0.8)
+        }
+        total = sum(emotions.values())
+        emotions = {k: v / total for k, v in emotions.items()}
+        dominant = max(emotions, key=emotions.get)
+        
+        return {
+            'emotions': emotions,
+            'dominant_emotion': dominant,
+            'confidence': emotions[dominant]
+        }
 
     def get_mental_health_recommendations(self, analysis):
+        """Generate mental health recommendations based on analysis"""
         text_sentiment = analysis.get('text', {}).get('sentiment', {}).get('label', 'NEUTRAL')
         facial_emotion = analysis.get('facial', {}).get('dominant_emotion', 'neutral')
         voice_emotion = analysis.get('voice', {}).get('dominant_emotion', 'neutral')
@@ -195,6 +146,7 @@ class MentalHealthAnalyzer:
         return recommendations
 
     def generate_chatbot_response(self, user_message, analysis):
+        """Generate chatbot response based on sentiment analysis"""
         text_sentiment = analysis.get('text', {}).get('sentiment', {}).get('label', 'NEUTRAL')
 
         responses = {
@@ -215,7 +167,6 @@ class MentalHealthAnalyzer:
             ]
         }
 
-        import random
         base_response = random.choice(responses.get(text_sentiment, responses['NEUTRAL']))
 
         if analysis.get('facial', {}).get('faces_detected', 0) > 0:
@@ -230,7 +181,7 @@ analyzer = MentalHealthAnalyzer()
 
 @app.route('/')
 def index():
-    return render_template('index.html')  # Make sure you have an index.html in templates/
+    return render_template('index.html')
 
 @app.route('/analyze', methods=['POST'])
 def analyze():
@@ -275,7 +226,7 @@ def analyze():
 @app.route('/history')
 def get_history():
     return jsonify({
-        'conversation_history': analyzer.conversation_history[-10:],  # last 10 entries
+        'conversation_history': analyzer.conversation_history[-10:],
         'user_profile': analyzer.user_profile
     })
 
@@ -307,7 +258,15 @@ def emergency_resources():
         ]
     })
 
+@app.route('/health')
+def health_check():
+    """Health check endpoint for deployment monitoring"""
+    return jsonify({
+        'status': 'healthy',
+        'timestamp': datetime.now().isoformat(),
+        'version': '1.0.0'
+    })
+
 if __name__ == '__main__':
-    import os
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=False)
