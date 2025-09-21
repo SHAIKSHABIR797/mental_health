@@ -1,5 +1,10 @@
 services:
   - type: web
-    name: mental_health-1
+    name: mental-health-companion
     env: python
-    pythonVersion: "3.10.13"  # Make sure this matches your desired Python version
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    plan: free
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.13

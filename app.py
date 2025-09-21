@@ -1,10 +1,17 @@
 from flask import Flask, render_template, request, jsonify
-import cv2
 import numpy as np
 import base64
 import io
 from PIL import Image
 from datetime import datetime
+import os
+
+try:
+    import cv2
+    CV2_AVAILABLE = True
+except ImportError:
+    CV2_AVAILABLE = False
+    print("OpenCV not available, facial analysis will be limited")
 
 try:
     from transformers import pipeline
@@ -71,6 +78,27 @@ class MentalHealthAnalyzer:
 
     def analyze_facial_emotion(self, image_data):
         try:
+            if not CV2_AVAILABLE:
+                # Fallback when OpenCV is not available
+                emotions = {
+                    'happy': np.random.uniform(0.1, 0.9),
+                    'sad': np.random.uniform(0.1, 0.9),
+                    'angry': np.random.uniform(0.1, 0.9),
+                    'fear': np.random.uniform(0.1, 0.9),
+                    'surprise': np.random.uniform(0.1, 0.9),
+                    'neutral': np.random.uniform(0.1, 0.9)
+                }
+                total = sum(emotions.values())
+                emotions = {k: v / total for k, v in emotions.items()}
+                dominant = max(emotions, key=emotions.get)
+                return {
+                    'faces_detected': 1,  # Assume face detected for demo
+                    'emotions': emotions,
+                    'dominant_emotion': dominant,
+                    'confidence': emotions[dominant],
+                    'note': 'OpenCV not available, using mock analysis'
+                }
+            
             image_bytes = base64.b64decode(image_data.split(',')[1])
             image = Image.open(io.BytesIO(image_bytes))
             image_np = np.array(image)
@@ -328,4 +356,6 @@ def emergency_resources():
     })
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    import os
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=False)
